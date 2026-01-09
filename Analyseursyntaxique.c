@@ -3,6 +3,38 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
+
+#define MAX_VARS 100
+
+char symbol_table[MAX_VARS][30];
+int symbol_count = 0;
+
+// Add variable to table if not already there
+void add_variable(const char *name){
+    for(int i = 0; i < symbol_count; i++){
+        if(strcmp(symbol_table[i], name) == 0)
+            return; // already exists
+    }
+    if(symbol_count < MAX_VARS)
+        strcpy(symbol_table[symbol_count++], name);
+    else{
+        printf("[ERREUR SEMANTIQUE] Trop de variables.\n");
+        exit(1);
+    }
+}
+
+// Check if variable exists
+int exists_variable(const char *name){
+    for(int i = 0; i < symbol_count; i++){
+        if(strcmp(symbol_table[i], name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+
 /* ========================================================= */
 /* ================== STRUCTURE DU PARSE TREE =============== */
 /* ========================================================= */
@@ -22,6 +54,12 @@ Node* newNode(const char *label, Node *c1, Node *c2, Node *c3){
     n->child3 = c3;
     return n;
 }
+
+
+
+
+
+
 
 /* ========================================================= */
 /* ====================== ERREURS =========================== */
@@ -81,7 +119,7 @@ INST →
 
 Node* INST(){
 
-    /* Affectation */
+    /* Affectation : ID := EXPR ; */
     if(SYM_COUR.CODE == ID_TOKEN){
         char id[30];
         strcpy(id, SYM_COUR.NOM);
@@ -93,21 +131,26 @@ Node* INST(){
 
         Test(PV_TOKEN, "';' attendu");
 
+        // Semantic: add variable if new
+        add_variable(id);
+
         return newNode("ASSIGN",
                 newNode(id, NULL, NULL, NULL),
                 expr,
                 NULL);
     }
 
-    /* read */
+    /* read(ID); */
     else if(SYM_COUR.CODE == READ_TOKEN){
         Sym_Suiv();
-
         Test(PO_TOKEN, "'(' attendu");
 
         char id[30];
         strcpy(id, SYM_COUR.NOM);
         Test(ID_TOKEN, "ID attendu");
+
+        // Semantic: reading a variable creates it
+        add_variable(id);
 
         Test(PF_TOKEN, "')' attendu");
         Test(PV_TOKEN, "';' attendu");
@@ -118,12 +161,23 @@ Node* INST(){
                 NULL);
     }
 
-    /* print */
+    /* print(EXPR); */
     else if(SYM_COUR.CODE == PRINT_TOKEN){
         Sym_Suiv();
-
         Test(PO_TOKEN, "'(' attendu");
+
         Node *expr = EXPR();
+
+        // Semantic: check that variable exists if it's an ID
+        // Leaf node check: child1, child2, child3 are NULL
+        if(expr->child1 == NULL && expr->child2 == NULL && expr->child3 == NULL){
+            // Not a number? Then it must exist as variable
+            if(!isdigit(expr->label[0]) && !exists_variable(expr->label)){
+                printf("[ERREUR SEMANTIQUE] Variable '%s' utilisée avant déclaration.\n", expr->label);
+                exit(1);
+            }
+        }
+
         Test(PF_TOKEN, "')' attendu");
         Test(PV_TOKEN, "';' attendu");
 
@@ -136,12 +190,18 @@ Node* INST(){
     }
 }
 
+
 /*
 EXPR → ID | NUM
 */
 
 Node* EXPR(){
     if(SYM_COUR.CODE == ID_TOKEN){
+        // Semantic: variable must exist
+        if(!exists_variable(SYM_COUR.NOM)){
+            printf("[ERREUR SEMANTIQUE] Variable '%s' utilisée avant déclaration.\n", SYM_COUR.NOM);
+            exit(1);
+        }
         Node *n = newNode(SYM_COUR.NOM, NULL, NULL, NULL);
         Sym_Suiv();
         return n;

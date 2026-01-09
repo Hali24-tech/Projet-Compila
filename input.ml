@@ -1,5 +1,4 @@
 start
-x := 3;
-read(x);
+x := 5
 print(x);
 stop
