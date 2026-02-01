@@ -1,4 +1,5 @@
 #include "lexical.h"
+#include<ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -238,7 +239,7 @@ void afficher(Node *n, int niveau){
 /* ========================= MAIN =========================== */
 /* ========================================================= */
 
-int main(){
+/*int main(){
     Fichier = fopen("input.ml", "r");
     if(!Fichier){
         printf("Erreur ouverture fichier\n");
@@ -255,4 +256,38 @@ int main(){
 
     fclose(Fichier);
     return 0;
+}*/
+//le main adapter pour combine des phases precedentes//
+int main(int argc, char *argv[]){
+    if(argc < 2){
+        printf("Usage: %s <fichier_pseudo_code>\n", argv[0]);
+        return 1;
+    }
+
+    Fichier = fopen(argv[1], "r");
+    if(!Fichier){
+        printf("❌ Erreur : impossible d'ouvrir %s\n", argv[1]);
+        return 1;
+    }
+
+    printf("=====================================\n");
+    printf("   PSEUDO-CODE ANALYZER \n");
+    printf("=====================================\n");
+    printf("Fichier analyse : %s\n\n", argv[1]);
+
+    Lire_Car();
+    Sym_Suiv();
+
+    Node *arbre = PROGRAM();
+
+    printf("\n [OK] Analyse lexicale terminee");
+    printf("\n [OK] Analyse syntaxique terminee");
+    printf("\n [OK] Analyse semantique terminee\n");
+
+    printf("\n====== PARSE TREE ======\n");
+    afficher(arbre, 0);
+
+    fclose(Fichier);
+    return 0;
 }
+
