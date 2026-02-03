@@ -194,3 +194,26 @@ void Sym_Suiv() {
             Lire_Car();
     }
 }
+/*
+ * Commentaire explicatif général :
+ *
+ * Ce fichier implémente l’analyseur lexical du langage.
+ * Son rôle principal est de lire le programme source caractère par caractère
+ * et de le transformer en une suite de symboles lexicaux (tokens) compréhensibles
+ * par l’analyseur syntaxique.
+ *
+ * L’analyseur lexical gère :
+ *  - La lecture séquentielle des caractères depuis le fichier source.
+ *  - L’élimination des séparateurs (espaces, tabulations, retours à la ligne).
+ *  - La reconnaissance des mots-clés (start, if, while, etc.).
+ *  - L’identification des identificateurs et des constantes numériques.
+ *  - La détection des opérateurs arithmétiques, relationnels et symboles spéciaux.
+ *
+ * La fonction principale Sym_Suiv() permet d’obtenir, à chaque appel,
+ * le prochain symbole lexical du programme et de le stocker dans la
+ * variable globale SYM_COUR.
+ *
+ * Ce module constitue la première phase du compilateur et fournit
+ * les éléments nécessaires à l’analyse syntaxique et à la construction
+ * de l’arbre syntaxique abstrait (AST).
+ */

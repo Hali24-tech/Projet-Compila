@@ -262,18 +262,31 @@ void afficher(Node *n, int niveau){
     afficher(n->child2, niveau + 1);
     afficher(n->child3, niveau + 1);
 }
-
-int main(){
-    Fichier = fopen("input.ml", "r");
-    if(!Fichier){
-        printf("Erreur ouverture fichier\n");
+int main(int argc, char *argv[]){
+    if(argc < 2){
+        printf("Usage: %s <fichier_pseudo_code>\n", argv[0]);
         return 1;
     }
+
+    Fichier = fopen(argv[1], "r");
+    if(!Fichier){
+        printf("❌ Erreur : impossible d'ouvrir %s\n", argv[1]);
+        return 1;
+    }
+
+    printf("=====================================\n");
+    printf("        PSEUDO-CODE ANALYZER\n");
+    printf("=====================================\n");
+    printf("Fichier analyse : %s\n\n", argv[1]);
 
     Lire_Car();
     Sym_Suiv();
 
     Node *arbre = PROGRAM();
+
+    printf("\n [OK] Analyse lexicale terminee");
+    printf("\n [OK] Analyse syntaxique terminee");
+    printf("\n [OK] Analyse semantique terminee\n");
 
     printf("\n====== PARSE TREE ======\n");
     afficher(arbre, 0);
@@ -284,3 +297,59 @@ int main(){
     fclose(Fichier);
     return 0;
 }
+
+
+// int main(){
+//     Fichier = fopen("input.ml", "r");
+//     if(!Fichier){
+//         printf("Erreur ouverture fichier\n");
+//         return 1;
+//     }
+
+//     Lire_Car();
+//     Sym_Suiv();
+
+//     Node *arbre = PROGRAM();
+
+//     printf("\n====== PARSE TREE ======\n");
+//     afficher(arbre, 0);
+
+//     translate_to_c(arbre);
+//     printf("\n✅ Fichier généré : output.c\n");
+
+//     fclose(Fichier);
+//     return 0;
+// }
+/*
+ * Commentaire explicatif général :
+ *
+ * Ce fichier implémente l’analyseur syntaxique (parser) du langage MiniLang ainsi qu’une
+ * vérification sémantique simple liée aux variables. Il s’appuie sur l’analyseur lexical
+ * (lexical.c) pour récupérer les tokens, puis construit un Arbre Syntaxique Abstrait (AST)
+ * à l’aide de la structure Node définie dans parser.h.
+ *
+ * 1) Gestion des symboles (table des variables)
+ *    - symbol_table, add_variable() et exists_variable() permettent d’enregistrer les variables
+ *      rencontrées (déclaration implicite via read ou affectation) et de détecter l’utilisation
+ *      d’une variable avant sa déclaration.
+ *
+ * 2) Construction de l’AST
+ *    - newNode() crée un nœud AST avec un label et jusqu’à trois enfants.
+ *    - PROGRAM(), INST(), BLOCK(), COND(), EXPR(), TERM(), FACT() sont des fonctions récursives
+ *      qui appliquent la grammaire du langage (analyse descendante récursive).
+ *
+ * 3) Contrôle syntaxique et messages d’erreur
+ *    - Test() vérifie qu’un token attendu est bien présent, sinon Erreur() affiche un message
+ *      détaillé indiquant le symbole courant (code + lexème) avant d’arrêter le programme.
+ *
+ * 4) Affichage et traduction
+ *    - afficher() affiche l’arbre obtenu (parse tree / AST) pour faciliter le débogage.
+ *    - translate_to_c(arbre) (dans translator.c) parcourt l’AST et génère un fichier output.c.
+ *
+ * 5) Fonction main()
+ *    - Ouvre le fichier source "input.ml", initialise la lecture lexicale, lance PROGRAM()
+ *      pour construire l’AST, affiche l’arbre, puis génère le code C final.
+ *
+ * Ce module représente la phase d’analyse syntaxique du compilateur et produit une structure
+ * (AST) exploitable par l’étape suivante : la traduction/génération de code en langage C.
+ */

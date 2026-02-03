@@ -57,3 +57,29 @@ void Lire_Car(void);
 void Sym_Suiv(void);
 
 #endif
+/*
+ * Commentaire explicatif général :
+ *
+ * Le fichier lexical.h définit les structures, types et constantes nécessaires
+ * au fonctionnement de l’analyseur lexical.
+ *
+ * Il contient :
+ *  - L’énumération CODES_LEX, qui regroupe l’ensemble des codes lexicaux
+ *    représentant les mots-clés, identificateurs, constantes, opérateurs
+ *    et symboles spéciaux du langage.
+ *
+ *  - La structure TSym_Cour, utilisée pour stocker le symbole lexical courant.
+ *    Elle associe le code lexical du symbole (CODE) à sa représentation
+ *    textuelle (NOM).
+ *
+ *  - Les déclarations des variables globales SYM_COUR et Fichier, partagées
+ *    entre l’analyseur lexical et les autres modules du compilateur.
+ *
+ *  - Les prototypes des fonctions principales Lire_Car() et Sym_Suiv(),
+ *    permettant respectivement de lire un caractère depuis le fichier source
+ *    et de produire le prochain symbole lexical.
+ *
+ * Ce fichier joue le rôle d’interface entre l’analyseur lexical et les autres
+ * phases du compilateur, en garantissant une communication claire et structurée
+ * des informations lexicales.
+ */
